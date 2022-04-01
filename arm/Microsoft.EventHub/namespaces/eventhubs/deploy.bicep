@@ -93,8 +93,8 @@ param captureDescriptionSizeLimitInBytes int = 314572800
 @description('Optional. A value that indicates whether to Skip Empty Archives')
 param captureDescriptionSkipEmptyArchives bool = false
 
-@description('Optional. Customer Usage Attribution ID (GUID). This GUID must be previously registered')
-param cuaId string = ''
+@description('Optional. Enable telemetry via the Customer Usage Attribution ID (GUID).')
+param enableDefaultTelemetry bool = true
 
 var eventHubPropertiesSimple = {
   messageRetentionInDays: messageRetentionInDays
@@ -122,9 +122,16 @@ var eventHubPropertiesWithCapture = {
   }
 }
 
-module pid_cuaId '.bicep/nested_cuaId.bicep' = if (!empty(cuaId)) {
-  name: 'pid-${cuaId}'
-  params: {}
+resource defaultTelemetry 'Microsoft.Resources/deployments@2021-04-01' = if (enableDefaultTelemetry) {
+  name: 'pid-47ed15a6-730a-4827-bcb4-0fd963ffbd82-${uniqueString(deployment().name)}'
+  properties: {
+    mode: 'Incremental'
+    template: {
+      '$schema': 'https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#'
+      contentVersion: '1.0.0.0'
+      resources: []
+    }
+  }
 }
 
 resource namespace 'Microsoft.EventHub/namespaces@2021-06-01-preview' existing = {
@@ -169,20 +176,22 @@ module eventHub_authorizationRules 'authorizationRules/deploy.bicep' = [for (aut
 module eventHub_rbac '.bicep/nested_rbac.bicep' = [for (roleAssignment, index) in roleAssignments: {
   name: '${deployment().name}-Rbac-${index}'
   params: {
+    description: contains(roleAssignment, 'description') ? roleAssignment.description : ''
     principalIds: roleAssignment.principalIds
+    principalType: contains(roleAssignment, 'principalType') ? roleAssignment.principalType : ''
     roleDefinitionIdOrName: roleAssignment.roleDefinitionIdOrName
     resourceId: eventHub.id
   }
 }]
 
 @description('The name of the event hub.')
-output eventhubName string = eventHub.name
+output name string = eventHub.name
 
 @description('The resource ID of the event hub.')
 output eventHubId string = eventHub.id
 
 @description('The resource group the event hub was deployed into.')
-output eventHubResourceGroup string = resourceGroup().name
+output resourceGroupName string = resourceGroup().name
 
 @description('The authentication rule resource ID of the event hub.')
-output authRuleResourceId string = resourceId('Microsoft.EventHub/namespaces/authorizationRules', namespaceName, 'RootManageSharedAccessKey')
+output resourceId string = az.resourceId('Microsoft.EventHub/namespaces/authorizationRules', namespaceName, 'RootManageSharedAccessKey')

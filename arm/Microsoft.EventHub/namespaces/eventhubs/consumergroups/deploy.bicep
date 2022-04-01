@@ -10,12 +10,19 @@ param name string
 @description('Optional. User Metadata is a placeholder to store user-defined string data with maximum length 1024. e.g. it can be used to store descriptive data, such as list of teams and their contact information also user-defined configuration settings can be stored.')
 param userMetadata string = ''
 
-@description('Optional. Customer Usage Attribution ID (GUID). This GUID must be previously registered')
-param cuaId string = ''
+@description('Optional. Enable telemetry via the Customer Usage Attribution ID (GUID).')
+param enableDefaultTelemetry bool = true
 
-module pid_cuaId '.bicep/nested_cuaId.bicep' = if (!empty(cuaId)) {
-  name: 'pid-${cuaId}'
-  params: {}
+resource defaultTelemetry 'Microsoft.Resources/deployments@2021-04-01' = if (enableDefaultTelemetry) {
+  name: 'pid-47ed15a6-730a-4827-bcb4-0fd963ffbd82-${uniqueString(deployment().name)}'
+  properties: {
+    mode: 'Incremental'
+    template: {
+      '$schema': 'https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#'
+      contentVersion: '1.0.0.0'
+      resources: []
+    }
+  }
 }
 
 resource namespace 'Microsoft.EventHub/namespaces@2021-06-01-preview' existing = {
@@ -35,10 +42,10 @@ resource consumerGroup 'Microsoft.EventHub/namespaces/eventhubs/consumergroups@2
 }
 
 @description('The name of the consumer group.')
-output consumerGroupName string = consumerGroup.name
+output name string = consumerGroup.name
 
 @description('The resource ID of the consumer group.')
-output consumerGroupResourceId string = consumerGroup.id
+output resourceId string = consumerGroup.id
 
 @description('The name of the resource group the consumer group was created in.')
-output consumerGroupResourceGroup string = resourceGroup().name
+output resourceGroupName string = resourceGroup().name

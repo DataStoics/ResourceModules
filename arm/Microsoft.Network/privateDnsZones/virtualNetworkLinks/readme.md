@@ -2,6 +2,13 @@
 
 This module deploys private dns zone virtual network links.
 
+## Navigation
+
+- [Resource Types](#Resource-Types)
+- [Parameters](#Parameters)
+- [Outputs](#Outputs)
+- [Template references](#Template-references)
+
 ## Resource Types
 
 | Resource Type | API Version |
@@ -10,15 +17,21 @@ This module deploys private dns zone virtual network links.
 
 ## Parameters
 
-| Parameter Name | Type | Default Value | Possible Values | Description |
-| :-- | :-- | :-- | :-- | :-- |
-| `cuaId` | string |  |  | Optional. Customer Usage Attribution ID (GUID). This GUID must be previously registered |
-| `location` | string | `global` |  | Optional. The location of the PrivateDNSZone. Should be global. |
-| `name` | string | `[format('{0}-vnetlink', last(split(parameters('virtualNetworkResourceId'), '/')))]` |  | Optional. The name of the virtual network link. |
-| `privateDnsZoneName` | string |  |  | Required. Private DNS zone name. |
-| `registrationEnabled` | bool |  |  | Optional. Is auto-registration of virtual machine records in the virtual network in the Private DNS zone enabled? |
-| `tags` | object | `{object}` |  | Optional. Tags of the resource. |
-| `virtualNetworkResourceId` | string |  |  | Required. Link to another virtual network resource ID. |
+**Required parameters**
+| Parameter Name | Type | Description |
+| :-- | :-- | :-- |
+| `privateDnsZoneName` | string | Private DNS zone name. |
+| `virtualNetworkResourceId` | string | Link to another virtual network resource ID. |
+
+**Optional parameters**
+| Parameter Name | Type | Default Value | Description |
+| :-- | :-- | :-- | :-- |
+| `enableDefaultTelemetry` | bool | `True` | Enable telemetry via the Customer Usage Attribution ID (GUID). |
+| `location` | string | `'global'` | The location of the PrivateDNSZone. Should be global. |
+| `name` | string | `[format('{0}-vnetlink', last(split(parameters('virtualNetworkResourceId'), '/')))]` | The name of the virtual network link. |
+| `registrationEnabled` | bool | `False` | Is auto-registration of virtual machine records in the virtual network in the Private DNS zone enabled? |
+| `tags` | object | `{object}` | Tags of the resource. |
+
 
 ### Parameter Usage: `tags`
 
@@ -41,9 +54,9 @@ Tag names and tag values can be provided as needed. A tag can be left without a 
 
 | Output Name | Type | Description |
 | :-- | :-- | :-- |
-| `virtualNetworkLinkName` | string | The name of the deployed virtual network link |
-| `virtualNetworkLinkResourceGroup` | string | The resource group of the deployed virtual network link |
-| `virtualNetworkLinkResourceId` | string | The resource ID of the deployed virtual network link |
+| `name` | string | The name of the deployed virtual network link |
+| `resourceGroupName` | string | The resource group of the deployed virtual network link |
+| `resourceId` | string | The resource ID of the deployed virtual network link |
 
 ## Template references
 

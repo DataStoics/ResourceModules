@@ -47,15 +47,22 @@ param idleTimeoutInMinutes int = 4
 ])
 param protocol string = 'Tcp'
 
-@description('Optional. Customer Usage Attribution ID (GUID). This GUID must be previously registered')
-param cuaId string = ''
+@description('Optional. Enable telemetry via the Customer Usage Attribution ID (GUID).')
+param enableDefaultTelemetry bool = true
 
-module pid_cuaId '.bicep/nested_cuaId.bicep' = if (!empty(cuaId)) {
-  name: 'pid-${cuaId}'
-  params: {}
+resource defaultTelemetry 'Microsoft.Resources/deployments@2021-04-01' = if (enableDefaultTelemetry) {
+  name: 'pid-47ed15a6-730a-4827-bcb4-0fd963ffbd82-${uniqueString(deployment().name)}'
+  properties: {
+    mode: 'Incremental'
+    template: {
+      '$schema': 'https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#'
+      contentVersion: '1.0.0.0'
+      resources: []
+    }
+  }
 }
 
-resource loadBalancer 'Microsoft.Network/loadBalancers@2021-02-01' existing = {
+resource loadBalancer 'Microsoft.Network/loadBalancers@2021-05-01' existing = {
   name: loadBalancerName
 }
 
@@ -65,7 +72,7 @@ resource inboundNatRule 'Microsoft.Network/loadBalancers/inboundNatRules@2021-05
     frontendPort: frontendPort
     backendPort: backendPort
     backendAddressPool: !empty(backendAddressPoolName) ? {
-      id: resourceId('Microsoft.Network/loadBalancers/backendAddressPools', name, backendAddressPoolName)
+      id: az.resourceId('Microsoft.Network/loadBalancers/backendAddressPools', name, backendAddressPoolName)
     } : null
     enableFloatingIP: enableFloatingIP
     enableTcpReset: enableTcpReset
@@ -81,10 +88,10 @@ resource inboundNatRule 'Microsoft.Network/loadBalancers/inboundNatRules@2021-05
 }
 
 @description('The name of the inbound NAT rule')
-output inboundNatRuleName string = inboundNatRule.name
+output name string = inboundNatRule.name
 
 @description('The resource ID of the inbound NAT rule')
-output inboundNatRuleResourceId string = inboundNatRule.id
+output resourceId string = inboundNatRule.id
 
 @description('The resource group the inbound NAT rule was deployed into')
-output inboundNatRuleResourceGroupName string = resourceGroup().name
+output resourceGroupName string = resourceGroup().name

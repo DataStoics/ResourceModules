@@ -2,6 +2,13 @@
 
 This module deploys a Backup Policy for a Recovery Services Vault
 
+## Navigation
+
+- [Resource types](#Resource-types)
+- [Parameters](#Parameters)
+- [Outputs](#Outputs)
+- [Template references](#Template-references)
+
 ## Resource types
 
 | Resource Type | API Version |
@@ -10,12 +17,18 @@ This module deploys a Backup Policy for a Recovery Services Vault
 
 ## Parameters
 
-| Parameter Name | Type | Default Value | Possible Values | Description |
-| :-- | :-- | :-- | :-- | :-- |
-| `backupPolicyProperties` | object |  |  | Required. Configuration of the Azure Recovery Service Vault Backup Policy |
-| `cuaId` | string |  |  | Optional. Customer Usage Attribution ID (GUID). This GUID must be previously registered |
-| `name` | string |  |  | Required. Name of the Azure Recovery Service Vault Backup Policy |
-| `recoveryVaultName` | string |  |  | Required. Name of the Azure Recovery Service Vault |
+**Required parameters**
+| Parameter Name | Type | Description |
+| :-- | :-- | :-- |
+| `backupPolicyProperties` | object | Configuration of the Azure Recovery Service Vault Backup Policy |
+| `name` | string | Name of the Azure Recovery Service Vault Backup Policy |
+| `recoveryVaultName` | string | Name of the Azure Recovery Service Vault |
+
+**Optional parameters**
+| Parameter Name | Type | Default Value | Description |
+| :-- | :-- | :-- | :-- |
+| `enableDefaultTelemetry` | bool | `True` | Enable telemetry via the Customer Usage Attribution ID (GUID). |
+
 
 ### Parameter Usage: `backupPolicyProperties`
 
@@ -109,9 +122,9 @@ Object continaining the configuration for backup policies. It needs to be proper
 
 | Output Name | Type | Description |
 | :-- | :-- | :-- |
-| `backupPolicyName` | string | The name of the backup policy |
-| `backupPolicyResourceGroup` | string | The name of the resource group the backup policy was created in. |
-| `backupPolicyResourceId` | string | The resource ID of the backup policy |
+| `name` | string | The name of the backup policy |
+| `resourceGroupName` | string | The name of the resource group the backup policy was created in. |
+| `resourceId` | string | The resource ID of the backup policy |
 
 ## Template references
 

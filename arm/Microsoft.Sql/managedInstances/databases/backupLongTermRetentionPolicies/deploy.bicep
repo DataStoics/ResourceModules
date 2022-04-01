@@ -19,12 +19,19 @@ param monthlyRetention string = 'P1Y'
 @description('Optional. The yearly retention policy for an LTR backup in an ISO 8601 format.')
 param yearlyRetention string = 'P5Y'
 
-@description('Optional. Customer Usage Attribution ID (GUID). This GUID must be previously registered')
-param cuaId string = ''
+@description('Optional. Enable telemetry via the Customer Usage Attribution ID (GUID).')
+param enableDefaultTelemetry bool = true
 
-module pid_cuaId '.bicep/nested_cuaId.bicep' = if (!empty(cuaId)) {
-  name: 'pid-${cuaId}'
-  params: {}
+resource defaultTelemetry 'Microsoft.Resources/deployments@2021-04-01' = if (enableDefaultTelemetry) {
+  name: 'pid-47ed15a6-730a-4827-bcb4-0fd963ffbd82-${uniqueString(deployment().name)}'
+  properties: {
+    mode: 'Incremental'
+    template: {
+      '$schema': 'https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#'
+      contentVersion: '1.0.0.0'
+      resources: []
+    }
+  }
 }
 
 resource managedInstance 'Microsoft.Sql/managedInstances@2021-05-01-preview' existing = {
@@ -47,10 +54,10 @@ resource backupLongTermRetentionPolicy 'Microsoft.Sql/managedInstances/databases
 }
 
 @description('The name of the deployed database backup long-term retention policy')
-output backupLongTermRetentionPolicyName string = backupLongTermRetentionPolicy.name
+output name string = backupLongTermRetentionPolicy.name
 
 @description('The resource ID of the deployed database backup long-term retention policy')
-output backupLongTermRetentionPolicyResourceId string = backupLongTermRetentionPolicy.id
+output resourceId string = backupLongTermRetentionPolicy.id
 
 @description('The resource group of the deployed database backup long-term retention policy')
-output backupLongTermRetentionPolicyResourceGroup string = resourceGroup().name
+output resourceGroupName string = resourceGroup().name

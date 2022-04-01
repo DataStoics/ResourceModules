@@ -41,8 +41,8 @@ param trafficAnalyticsInterval int = 60
 @maxValue(365)
 param retentionInDays int = 365
 
-@description('Optional. Customer Usage Attribution ID (GUID). This GUID must be previously registered')
-param cuaId string = ''
+@description('Optional. Enable telemetry via the Customer Usage Attribution ID (GUID).')
+param enableDefaultTelemetry bool = true
 
 var flowAnalyticsConfiguration = !empty(workspaceResourceId) && enabled == true ? {
   networkWatcherFlowAnalyticsConfiguration: {
@@ -56,16 +56,23 @@ var flowAnalyticsConfiguration = !empty(workspaceResourceId) && enabled == true 
   }
 }
 
-module pid_cuaId '.bicep/nested_cuaId.bicep' = if (!empty(cuaId)) {
-  name: 'pid-${cuaId}'
-  params: {}
+resource defaultTelemetry 'Microsoft.Resources/deployments@2021-04-01' = if (enableDefaultTelemetry) {
+  name: 'pid-47ed15a6-730a-4827-bcb4-0fd963ffbd82-${uniqueString(deployment().name, location)}'
+  properties: {
+    mode: 'Incremental'
+    template: {
+      '$schema': 'https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#'
+      contentVersion: '1.0.0.0'
+      resources: []
+    }
+  }
 }
 
-resource networkWatcher 'Microsoft.Network/networkWatchers@2021-03-01' existing = {
+resource networkWatcher 'Microsoft.Network/networkWatchers@2021-05-01' existing = {
   name: networkWatcherName
 }
 
-resource flowLog 'Microsoft.Network/networkWatchers/flowLogs@2021-03-01' = {
+resource flowLog 'Microsoft.Network/networkWatchers/flowLogs@2021-05-01' = {
   name: name
   parent: networkWatcher
   tags: tags
@@ -86,10 +93,10 @@ resource flowLog 'Microsoft.Network/networkWatchers/flowLogs@2021-03-01' = {
   }
 }
 @description('The name of the flow log')
-output flowLogName string = flowLog.name
+output name string = flowLog.name
 
 @description('The resource ID of the flow log')
-output flowLogResourceId string = flowLog.id
+output resourceId string = flowLog.id
 
 @description('The resource group the flow log was deployed into')
-output flowLogResourceGroup string = resourceGroup().name
+output resourceGroupName string = resourceGroup().name

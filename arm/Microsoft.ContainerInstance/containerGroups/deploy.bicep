@@ -56,8 +56,8 @@ param userAssignedIdentities object = {}
 @description('Optional. Tags of the resource.')
 param tags object = {}
 
-@description('Optional. Customer Usage Attribution ID (GUID). This GUID must be previously registered')
-param cuaId string = ''
+@description('Optional. Enable telemetry via the Customer Usage Attribution ID (GUID).')
+param enableDefaultTelemetry bool = true
 
 var identityType = systemAssignedIdentity ? (!empty(userAssignedIdentities) ? 'SystemAssigned,UserAssigned' : 'SystemAssigned') : (!empty(userAssignedIdentities) ? 'UserAssigned' : 'None')
 
@@ -66,9 +66,16 @@ var identity = identityType != 'None' ? {
   userAssignedIdentities: !empty(userAssignedIdentities) ? userAssignedIdentities : null
 } : null
 
-module pid_cuaId '.bicep/nested_cuaId.bicep' = if (!empty(cuaId)) {
-  name: 'pid-${cuaId}'
-  params: {}
+resource defaultTelemetry 'Microsoft.Resources/deployments@2021-04-01' = if (enableDefaultTelemetry) {
+  name: 'pid-47ed15a6-730a-4827-bcb4-0fd963ffbd82-${uniqueString(deployment().name, location)}'
+  properties: {
+    mode: 'Incremental'
+    template: {
+      '$schema': 'https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#'
+      contentVersion: '1.0.0.0'
+      resources: []
+    }
+  }
 }
 
 resource containergroup 'Microsoft.ContainerInstance/containerGroups@2021-03-01' = {
@@ -114,16 +121,16 @@ resource containergroup_lock 'Microsoft.Authorization/locks@2017-04-01' = if (lo
 }
 
 @description('The name of the container group')
-output containerGroupName string = containergroup.name
+output name string = containergroup.name
 
 @description('The resource ID of the container group')
-output containerGroupResourceId string = containergroup.id
+output resourceId string = containergroup.id
 
 @description('The resource group the container group was deployed into')
-output containerGroupResourceGroup string = resourceGroup().name
+output resourceGroupName string = resourceGroup().name
 
 @description('The IPv4 address of the container group')
-output containerGroupIPv4Address string = containergroup.properties.ipAddress.ip
+output iPv4Address string = containergroup.properties.ipAddress.ip
 
 @description('The principal ID of the system assigned identity.')
 output systemAssignedPrincipalId string = systemAssignedIdentity && contains(containergroup.identity, 'principalId') ? containergroup.identity.principalId : ''

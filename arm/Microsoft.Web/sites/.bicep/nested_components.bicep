@@ -22,14 +22,14 @@ param workspaceResourceId string
   'Enabled'
   'Disabled'
 ])
-param appInsightsPublicNetworkAccessForIngestion string = 'Enabled'
+param publicNetworkAccessForIngestion string = 'Enabled'
 
 @description('Optional. The network access type for accessing Application Insights query. - Enabled or Disabled.')
 @allowed([
   'Enabled'
   'Disabled'
 ])
-param appInsightsPublicNetworkAccessForQuery string = 'Enabled'
+param publicNetworkAccessForQuery string = 'Enabled'
 
 @description('Optional. The kind of application that this component refers to, used to customize UI. This value is a freeform string, values should typically be one of the following: web, ios, other, store, java, phone.')
 param kind string = ''
@@ -57,8 +57,8 @@ resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
     Application_Type: appInsightsType
     Request_Source: appInsightsRequestSource
     WorkspaceResourceId: workspaceResourceId
-    publicNetworkAccessForIngestion: appInsightsPublicNetworkAccessForIngestion
-    publicNetworkAccessForQuery: appInsightsPublicNetworkAccessForQuery
+    publicNetworkAccessForIngestion: publicNetworkAccessForIngestion
+    publicNetworkAccessForQuery: publicNetworkAccessForQuery
   }
 }
 
@@ -72,10 +72,10 @@ resource appInsights_lock 'Microsoft.Authorization/locks@2017-04-01' = if (lock 
 }
 
 @description('The name of the application insights component.')
-output appInsightsName string = appInsights.name
+output name string = appInsights.name
 
 @description('The resource ID of the application insights component.')
-output appInsightsResourceId string = appInsights.id
+output resourceId string = appInsights.id
 
 @description('The resource group the application insights component was deployed into.')
-output appInsightsResourceGroup string = resourceGroup().name
+output resourceGroupName string = resourceGroup().name

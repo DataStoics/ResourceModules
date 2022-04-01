@@ -30,12 +30,19 @@ param storageEndpoint string = ''
 @description('Required. The Name of SQL Server')
 param serverName string
 
-@description('Optional. Customer Usage Attribution ID (GUID). This GUID must be previously registered')
-param cuaId string = ''
+@description('Optional. Enable telemetry via the Customer Usage Attribution ID (GUID).')
+param enableDefaultTelemetry bool = true
 
-module pid_cuaId '.bicep/nested_cuaId.bicep' = if (!empty(cuaId)) {
-  name: 'pid-${cuaId}'
-  params: {}
+resource defaultTelemetry 'Microsoft.Resources/deployments@2021-04-01' = if (enableDefaultTelemetry) {
+  name: 'pid-47ed15a6-730a-4827-bcb4-0fd963ffbd82-${uniqueString(deployment().name)}'
+  properties: {
+    mode: 'Incremental'
+    template: {
+      '$schema': 'https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#'
+      contentVersion: '1.0.0.0'
+      resources: []
+    }
+  }
 }
 
 resource server 'Microsoft.Sql/servers@2021-05-01-preview' existing = {
@@ -57,10 +64,10 @@ resource securityAlertPolicy 'Microsoft.Sql/servers/securityAlertPolicies@2021-0
 }
 
 @description('The name of the deployed security alert policy')
-output databaseName string = securityAlertPolicy.name
+output name string = securityAlertPolicy.name
 
 @description('The resource ID of the deployed security alert policy')
-output databaseResourceId string = securityAlertPolicy.id
+output resourceId string = securityAlertPolicy.id
 
 @description('The resourceGroup of the deployed security alert policy')
-output databaseResourceGroup string = resourceGroup().name
+output resourceGroupName string = resourceGroup().name

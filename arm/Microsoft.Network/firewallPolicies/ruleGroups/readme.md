@@ -2,6 +2,13 @@
 
 This module deploys Network FirewallPolicies Rule Groups.
 
+## Navigation
+
+- [Resource Types](#Resource-Types)
+- [Parameters](#Parameters)
+- [Outputs](#Outputs)
+- [Template references](#Template-references)
+
 ## Resource Types
 
 | Resource Type | API Version |
@@ -10,13 +17,19 @@ This module deploys Network FirewallPolicies Rule Groups.
 
 ## Parameters
 
-| Parameter Name | Type | Default Value | Possible Values | Description |
-| :-- | :-- | :-- | :-- | :-- |
-| `cuaId` | string |  |  | Optional. Customer Usage Attribution ID (GUID). This GUID must be previously registered |
-| `firewallPolicyName` | string |  |  | Required. Name of the Firewall Policy. |
-| `name` | string |  |  | Required. The name of the rule group to deploy |
-| `priority` | int |  |  | Required. Priority of the Firewall Policy Rule Group resource. |
-| `rules` | array | `[]` |  | Optional. Group of Firewall rules. |
+**Required parameters**
+| Parameter Name | Type | Description |
+| :-- | :-- | :-- |
+| `firewallPolicyName` | string | Name of the Firewall Policy. |
+| `name` | string | The name of the rule group to deploy |
+| `priority` | int | Priority of the Firewall Policy Rule Group resource. |
+
+**Optional parameters**
+| Parameter Name | Type | Default Value | Description |
+| :-- | :-- | :-- | :-- |
+| `enableDefaultTelemetry` | bool | `True` | Enable telemetry via the Customer Usage Attribution ID (GUID). |
+| `rules` | array | `[]` | Group of Firewall rules. |
+
 
 ### Parameter Usage: `rules`
 
@@ -37,9 +50,9 @@ For remaining properties, see [FirewallPolicyRule objects](https://docs.microsof
 
 | Output Name | Type | Description |
 | :-- | :-- | :-- |
-| `ruleGroupName` | string | The name of the deployed rule group |
-| `ruleGroupResourceGroup` | string | The resource group of the deployed rule group |
-| `ruleGroupResourceId` | string | The resource ID of the deployed rule group |
+| `name` | string | The name of the deployed rule group |
+| `resourceGroupName` | string | The resource group of the deployed rule group |
+| `resourceId` | string | The resource ID of the deployed rule group |
 
 ## Template references
 

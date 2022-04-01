@@ -40,12 +40,19 @@ param friendlyName string = ''
 ])
 param containerType string = ''
 
-@description('Optional. Customer Usage Attribution ID (GUID). This GUID must be previously registered')
-param cuaId string = ''
+@description('Optional. Enable telemetry via the Customer Usage Attribution ID (GUID).')
+param enableDefaultTelemetry bool = true
 
-module pid_cuaId './.bicep/nested_cuaId.bicep' = if (!empty(cuaId)) {
-  name: 'pid-${cuaId}'
-  params: {}
+resource defaultTelemetry 'Microsoft.Resources/deployments@2021-04-01' = if (enableDefaultTelemetry) {
+  name: 'pid-47ed15a6-730a-4827-bcb4-0fd963ffbd82-${uniqueString(deployment().name)}'
+  properties: {
+    mode: 'Incremental'
+    template: {
+      '$schema': 'https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#'
+      contentVersion: '1.0.0.0'
+      resources: []
+    }
+  }
 }
 
 resource protectionContainer 'Microsoft.RecoveryServices/vaults/backupFabrics/protectionContainers@2021-08-01' = {
@@ -54,15 +61,15 @@ resource protectionContainer 'Microsoft.RecoveryServices/vaults/backupFabrics/pr
     sourceResourceId: !empty(sourceResourceId) ? sourceResourceId : null
     friendlyName: !empty(friendlyName) ? friendlyName : null
     backupManagementType: !empty(backupManagementType) ? backupManagementType : null
-    containerType: !empty(containerType) ? containerType : null
+    containerType: !empty(containerType) ? any(containerType) : null
   }
 }
 
 @description('The name of the Resource Group the Protection Container was created in.')
-output protectionContainerResourceGroup string = resourceGroup().name
+output resourceGroupName string = resourceGroup().name
 
 @description('The resource ID of the Protection Container.')
-output protectionContainerResourceId string = protectionContainer.id
+output resourceId string = protectionContainer.id
 
 @description('The Name of the Protection Container.')
-output protectionContainerName string = protectionContainer.name
+output name string = protectionContainer.name

@@ -1,6 +1,13 @@
 # RecoveryServicesVaultsBackupStorageConfig `[Microsoft.RecoveryServices/vaults/backupstorageconfig]`
 
 This module deploys the Backup Storage Configuration for the Recovery Service Vault
+## Navigation
+
+- [Resource types](#Resource-types)
+- [Parameters](#Parameters)
+- [Outputs](#Outputs)
+- [Template references](#Template-references)
+
 ## Resource types
 
 | Resource Type | API Version |
@@ -9,22 +16,27 @@ This module deploys the Backup Storage Configuration for the Recovery Service Va
 
 ## Parameters
 
-| Parameter Name | Type | Default Value | Possible Values | Description |
+**Required parameters**
+| Parameter Name | Type | Description |
+| :-- | :-- | :-- |
+| `recoveryVaultName` | string | Name of the Azure Recovery Service Vault |
+
+**Optional parameters**
+| Parameter Name | Type | Default Value | Allowed Values | Description |
 | :-- | :-- | :-- | :-- | :-- |
-| `crossRegionRestoreFlag` | bool | `True` |  | Optional. Opt in details of Cross Region Restore feature |
-| `cuaId` | string |  |  | Optional. Customer Usage Attribution ID (GUID). This GUID must be previously registered |
-| `name` | string | `vaultstorageconfig` |  | Optional. The name of the backup storage config |
-| `recoveryVaultName` | string |  |  | Required. Name of the Azure Recovery Service Vault |
-| `storageModelType` | string | `GeoRedundant` | `[GeoRedundant, LocallyRedundant, ReadAccessGeoZoneRedundant, ZoneRedundant]` | Optional. Change Vault Storage Type (Works if vault has not registered any backup instance) |
+| `crossRegionRestoreFlag` | bool | `True` |  | Opt in details of Cross Region Restore feature |
+| `enableDefaultTelemetry` | bool | `True` |  | Enable telemetry via the Customer Usage Attribution ID (GUID). |
+| `name` | string | `'vaultstorageconfig'` |  | The name of the backup storage config |
+| `storageModelType` | string | `'GeoRedundant'` | `[GeoRedundant, LocallyRedundant, ReadAccessGeoZoneRedundant, ZoneRedundant]` | Change Vault Storage Type (Works if vault has not registered any backup instance) |
 
 
 ## Outputs
 
 | Output Name | Type | Description |
 | :-- | :-- | :-- |
-| `backupStorageConfigName` | string | The name of the backup storage config |
-| `backupStorageConfigResourceGroup` | string | The name of the Resource Group the backup storage configuration was created in. |
-| `backupStorageConfigResourceId` | string | The resource ID of the backup storage config |
+| `name` | string | The name of the backup storage config |
+| `resourceGroupName` | string | The name of the Resource Group the backup storage configuration was created in. |
+| `resourceId` | string | The resource ID of the backup storage config |
 
 ## Template references
 

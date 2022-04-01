@@ -60,20 +60,20 @@ param lock string = 'NotSpecified'
 @description('Optional. Tags of the resource.')
 param tags object = {}
 
-@description('Optional. Customer Usage Attribution ID (GUID). This GUID must be previously registered')
-param cuaId string = ''
+@description('Optional. Enable telemetry via the Customer Usage Attribution ID (GUID).')
+param enableDefaultTelemetry bool = true
 
-var localVirtualNetworkGatewayId = resourceId(resourceGroup().name, 'Microsoft.Network/virtualNetworkGateways', localVirtualNetworkGatewayName)
+var localVirtualNetworkGatewayId = az.resourceId(resourceGroup().name, 'Microsoft.Network/virtualNetworkGateways', localVirtualNetworkGatewayName)
 var remoteEntitySubscriptionId_var = (empty(remoteEntitySubscriptionId) ? subscription().subscriptionId : remoteEntitySubscriptionId)
 var remoteEntityResourceGroup_var = (empty(remoteEntityResourceGroup) ? resourceGroup().name : remoteEntityResourceGroup)
 var virtualNetworkGateway2Id = {
-  id: resourceId(remoteEntitySubscriptionId_var, remoteEntityResourceGroup_var, 'Microsoft.Network/virtualNetworkGateways', remoteEntityName)
+  id: az.resourceId(remoteEntitySubscriptionId_var, remoteEntityResourceGroup_var, 'Microsoft.Network/virtualNetworkGateways', remoteEntityName)
 }
 var localNetworkGateway2Id = {
-  id: resourceId(remoteEntitySubscriptionId_var, remoteEntityResourceGroup_var, 'Microsoft.Network/localNetworkGateways', remoteEntityName)
+  id: az.resourceId(remoteEntitySubscriptionId_var, remoteEntityResourceGroup_var, 'Microsoft.Network/localNetworkGateways', remoteEntityName)
 }
 var peer = {
-  id: resourceId(remoteEntitySubscriptionId_var, remoteEntityResourceGroup_var, 'Microsoft.Network/expressRouteCircuits', remoteEntityName)
+  id: az.resourceId(remoteEntitySubscriptionId_var, remoteEntityResourceGroup_var, 'Microsoft.Network/expressRouteCircuits', remoteEntityName)
 }
 var customIPSecPolicy_var = [
   {
@@ -88,12 +88,19 @@ var customIPSecPolicy_var = [
   }
 ]
 
-module pid_cuaId '.bicep/nested_cuaId.bicep' = if (!empty(cuaId)) {
-  name: 'pid-${cuaId}'
-  params: {}
+resource defaultTelemetry 'Microsoft.Resources/deployments@2021-04-01' = if (enableDefaultTelemetry) {
+  name: 'pid-47ed15a6-730a-4827-bcb4-0fd963ffbd82-${uniqueString(deployment().name, location)}'
+  properties: {
+    mode: 'Incremental'
+    template: {
+      '$schema': 'https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#'
+      contentVersion: '1.0.0.0'
+      resources: []
+    }
+  }
 }
 
-resource connection 'Microsoft.Network/connections@2021-02-01' = {
+resource connection 'Microsoft.Network/connections@2021-05-01' = {
   name: name
   location: location
   tags: tags
@@ -107,7 +114,7 @@ resource connection 'Microsoft.Network/connections@2021-02-01' = {
     enableBgp: enableBgp
     connectionType: virtualNetworkGatewayConnectionType
     routingWeight: routingWeight
-    sharedKey: virtualNetworkGatewayConnectionType == 'ExpressRoute' ? vpnSharedKey : null
+    sharedKey: virtualNetworkGatewayConnectionType == 'ExpressRoute' ? null : vpnSharedKey
     usePolicyBasedTrafficSelectors: usePolicyBasedTrafficSelectors
     ipsecPolicies: empty(customIPSecPolicy.ipsecEncryption) ? customIPSecPolicy.ipsecEncryption : customIPSecPolicy_var
   }
@@ -123,10 +130,10 @@ resource connection_lock 'Microsoft.Authorization/locks@2017-04-01' = if (lock !
 }
 
 @description('The resource group the remote connection was deployed into')
-output remoteConnectionResourceGroup string = resourceGroup().name
+output resourceGroupName string = resourceGroup().name
 
 @description('The name of the remote connection')
-output connectionName string = connection.name
+output name string = connection.name
 
 @description('The resource ID of the remote connection')
-output remoteConnectionResourceId string = connection.id
+output resourceId string = connection.id

@@ -14,12 +14,19 @@ param name string
 ])
 param rights array = []
 
-@description('Optional. Customer Usage Attribution ID (GUID). This GUID must be previously registered')
-param cuaId string = ''
+@description('Optional. Enable telemetry via the Customer Usage Attribution ID (GUID).')
+param enableDefaultTelemetry bool = true
 
-module pid_cuaId '.bicep/nested_cuaId.bicep' = if (!empty(cuaId)) {
-  name: 'pid-${cuaId}'
-  params: {}
+resource defaultTelemetry 'Microsoft.Resources/deployments@2021-04-01' = if (enableDefaultTelemetry) {
+  name: 'pid-47ed15a6-730a-4827-bcb4-0fd963ffbd82-${uniqueString(deployment().name)}'
+  properties: {
+    mode: 'Incremental'
+    template: {
+      '$schema': 'https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#'
+      contentVersion: '1.0.0.0'
+      resources: []
+    }
+  }
 }
 
 resource namespace 'Microsoft.ServiceBus/namespaces@2021-06-01-preview' existing = {
@@ -35,10 +42,10 @@ resource authorizationRule 'Microsoft.ServiceBus/namespaces/AuthorizationRules@2
 }
 
 @description('The name of the authorization rule.')
-output authorizationRuleName string = authorizationRule.name
+output name string = authorizationRule.name
 
 @description('The resource ID of the authorization rule.')
-output authorizationRuleResourceId string = authorizationRule.id
+output resourceId string = authorizationRule.id
 
 @description('The name of the Resource Group the authorization rule was created in.')
-output authorizationRuleResourceGroup string = resourceGroup().name
+output resourceGroupName string = resourceGroup().name

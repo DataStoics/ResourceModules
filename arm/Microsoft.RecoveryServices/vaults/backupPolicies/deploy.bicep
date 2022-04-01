@@ -7,12 +7,19 @@ param name string
 @description('Required. Configuration of the Azure Recovery Service Vault Backup Policy')
 param backupPolicyProperties object
 
-@description('Optional. Customer Usage Attribution ID (GUID). This GUID must be previously registered')
-param cuaId string = ''
+@description('Optional. Enable telemetry via the Customer Usage Attribution ID (GUID).')
+param enableDefaultTelemetry bool = true
 
-module pid_cuaId './.bicep/nested_cuaId.bicep' = if (!empty(cuaId)) {
-  name: 'pid-${cuaId}'
-  params: {}
+resource defaultTelemetry 'Microsoft.Resources/deployments@2021-04-01' = if (enableDefaultTelemetry) {
+  name: 'pid-47ed15a6-730a-4827-bcb4-0fd963ffbd82-${uniqueString(deployment().name)}'
+  properties: {
+    mode: 'Incremental'
+    template: {
+      '$schema': 'https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#'
+      contentVersion: '1.0.0.0'
+      resources: []
+    }
+  }
 }
 
 resource rsv 'Microsoft.RecoveryServices/vaults@2021-12-01' existing = {
@@ -26,10 +33,10 @@ resource backupPolicy 'Microsoft.RecoveryServices/vaults/backupPolicies@2021-08-
 }
 
 @description('The name of the backup policy')
-output backupPolicyName string = backupPolicy.name
+output name string = backupPolicy.name
 
 @description('The resource ID of the backup policy')
-output backupPolicyResourceId string = backupPolicy.id
+output resourceId string = backupPolicy.id
 
 @description('The name of the resource group the backup policy was created in.')
-output backupPolicyResourceGroup string = resourceGroup().name
+output resourceGroupName string = resourceGroup().name

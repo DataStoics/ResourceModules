@@ -1,6 +1,6 @@
 # Removal action
 
-This section describes how the removal of resources deployed by a module is performed and how to modify the default behaviour if a specific module or resource type needs it.
+This section describes how the removal of resources deployed by a module is performed and how to modify the default behavior if a specific module or resource type needs it.
 
 ---
 
@@ -32,16 +32,16 @@ The removal process will remove all resources created during deployment. The lis
 After a resource is removed (this happens after each resource in the list), the script will execute, if defined, a **post removal operation**. This can be used for those resource types that requires a post processing, like purging a soft-deleted key vault.
 
 The procedure is initiated by the script `/utilities/pipelines/resourceRemoval/Initialize-DeploymentRemoval.ps1`, run during deployment by:
-- (Azure DevOps) `/.azuredevops/pipelineTemplates/module.jobs.deploy.yml`
+- (Azure DevOps) `/.azuredevops/pipelineTemplates/jobs.validateModuleDeployment.yml`
 - (GitHub) `/.github/actions/templates/validateModuleDeployment/action.yml`
 
 It uses several helper scripts that can be found in the `/utilities/pipelines/resourceRemoval/helper` folder
 # Create a specialized removal procedure
 
 You can define a custom removal procedure by:
-1. influencing the **order** in which resources are removed by prioritizing specific resource types 
+1. influencing the **order** in which resources are removed by prioritizing specific resource types
     > **Example** Removing a _Virtual WAN_ resource requires related resources to be deleted in a specific order
-1. defining a **custom removal action** to remove a resource of a _specific resource type_ 
+1. defining a **custom removal action** to remove a resource of a _specific resource type_
     > **Example** A _Recovery Services Vault_ resource requires some protected items to be identified and removed beforehand
 1. defining a custom **post-removal action** to be run after removing a resource of a _specific resource type_
     > **Example** A _Key Vault_ resource needs to be purged when soft deletion is enforced
@@ -57,7 +57,7 @@ To modify the resource types removal **order**:
 1. In the case block, update the `$removalSequence` variable value to accommodate your module requirements
 1. Remember to add the `break` statement.
 
-To defina a **custom removal** action:
+To define a **custom removal** action:
 1. Open the `/utilities/pipelines/resourceRemoval/helper/Invoke-ResourceRemoval.ps1` file.
 1. Look for the following comment: `### CODE LOCATION: Add custom removal action here`
 1. Add a case value that matches the resource type you want to modify the removal action for

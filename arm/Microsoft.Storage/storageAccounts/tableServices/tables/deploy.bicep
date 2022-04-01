@@ -8,12 +8,19 @@ param tableServicesName string = 'default'
 @description('Required. Name of the table.')
 param name string
 
-@description('Optional. Customer Usage Attribution ID (GUID). This GUID must be previously registered')
-param cuaId string = ''
+@description('Optional. Enable telemetry via the Customer Usage Attribution ID (GUID).')
+param enableDefaultTelemetry bool = true
 
-module pid_cuaId '.bicep/nested_cuaId.bicep' = if (!empty(cuaId)) {
-  name: 'pid-${cuaId}'
-  params: {}
+resource defaultTelemetry 'Microsoft.Resources/deployments@2021-04-01' = if (enableDefaultTelemetry) {
+  name: 'pid-47ed15a6-730a-4827-bcb4-0fd963ffbd82-${uniqueString(deployment().name)}'
+  properties: {
+    mode: 'Incremental'
+    template: {
+      '$schema': 'https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#'
+      contentVersion: '1.0.0.0'
+      resources: []
+    }
+  }
 }
 
 resource storageAccount 'Microsoft.Storage/storageAccounts@2021-06-01' existing = {
@@ -30,10 +37,10 @@ resource table 'Microsoft.Storage/storageAccounts/tableServices/tables@2021-06-0
 }
 
 @description('The name of the deployed file share service')
-output tableName string = table.name
+output name string = table.name
 
 @description('The resource ID of the deployed file share service')
-output tableResourceId string = table.id
+output resourceId string = table.id
 
 @description('The resource group of the deployed file share service')
-output tableResourceGroup string = resourceGroup().name
+output resourceGroupName string = resourceGroup().name

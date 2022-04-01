@@ -172,12 +172,19 @@ var upgradeSettings = {
   maxSurge: maxSurge
 }
 
-@description('Optional. Customer Usage Attribution ID (GUID). This GUID must be previously registered')
-param cuaId string = ''
+@description('Optional. Enable telemetry via the Customer Usage Attribution ID (GUID).')
+param enableDefaultTelemetry bool = true
 
-module pid_cuaId '.bicep/nested_cuaId.bicep' = if (!empty(cuaId)) {
-  name: 'pid-${cuaId}'
-  params: {}
+resource defaultTelemetry 'Microsoft.Resources/deployments@2021-04-01' = if (enableDefaultTelemetry) {
+  name: 'pid-47ed15a6-730a-4827-bcb4-0fd963ffbd82-${uniqueString(deployment().name)}'
+  properties: {
+    mode: 'Incremental'
+    template: {
+      '$schema': 'https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#'
+      contentVersion: '1.0.0.0'
+      resources: []
+    }
+  }
 }
 
 resource managedCluster 'Microsoft.ContainerService/managedClusters@2021-08-01' existing = {
@@ -226,10 +233,10 @@ resource agentPool 'Microsoft.ContainerService/managedClusters/agentPools@2021-0
 }
 
 @description('The name of the agent pool')
-output agentPoolName string = agentPool.name
+output name string = agentPool.name
 
 @description('The resource ID of the agent pool')
-output agentPoolResourceId string = agentPool.id
+output resourceId string = agentPool.id
 
 @description('The resource group the agent pool was deployed into.')
-output agentPoolResourceGroup string = resourceGroup().name
+output resourceGroupName string = resourceGroup().name

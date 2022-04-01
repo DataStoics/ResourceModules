@@ -10,15 +10,22 @@ param loadBalancerBackendAddresses array = []
 @description('Optional. An array of gateway load balancer tunnel interfaces.')
 param tunnelInterfaces array = []
 
-@description('Optional. Customer Usage Attribution ID (GUID). This GUID must be previously registered')
-param cuaId string = ''
+@description('Optional. Enable telemetry via the Customer Usage Attribution ID (GUID).')
+param enableDefaultTelemetry bool = true
 
-module pid_cuaId '.bicep/nested_cuaId.bicep' = if (!empty(cuaId)) {
-  name: 'pid-${cuaId}'
-  params: {}
+resource defaultTelemetry 'Microsoft.Resources/deployments@2021-04-01' = if (enableDefaultTelemetry) {
+  name: 'pid-47ed15a6-730a-4827-bcb4-0fd963ffbd82-${uniqueString(deployment().name)}'
+  properties: {
+    mode: 'Incremental'
+    template: {
+      '$schema': 'https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#'
+      contentVersion: '1.0.0.0'
+      resources: []
+    }
+  }
 }
 
-resource loadBalancer 'Microsoft.Network/loadBalancers@2021-02-01' existing = {
+resource loadBalancer 'Microsoft.Network/loadBalancers@2021-05-01' existing = {
   name: loadBalancerName
 }
 
@@ -32,10 +39,10 @@ resource backendAddressPool 'Microsoft.Network/loadBalancers/backendAddressPools
 }
 
 @description('The name of the backend address pool')
-output inboundNatRuleName string = backendAddressPool.name
+output name string = backendAddressPool.name
 
 @description('The resource ID of the backend address pool')
-output inboundNatRuleResourceId string = backendAddressPool.id
+output resourceId string = backendAddressPool.id
 
 @description('The resource group the backend address pool was deployed into')
-output inboundNatRuleResourceGroupName string = resourceGroup().name
+output resourceGroupName string = resourceGroup().name

@@ -2,6 +2,13 @@
 
 This module deploys a Managed Virtual Network for an Azure Data Factory
 
+## Navigation
+
+- [Resource types](#Resource-types)
+- [Parameters](#Parameters)
+- [Outputs](#Outputs)
+- [Template references](#Template-references)
+
 ## Resource types
 
 | Resource Type | API Version |
@@ -10,19 +17,25 @@ This module deploys a Managed Virtual Network for an Azure Data Factory
 
 ## Parameters
 
-| Parameter Name | Type | Default Value | Possible Values | Description |
-| :-- | :-- | :-- | :-- | :-- |
-| `cuaId` | string |  |  | Optional. Customer Usage Attribution ID (GUID). This GUID must be previously registered |
-| `dataFactoryName` | string |  |  | Required. The name of the Azure Data Factory |
-| `name` | string |  |  | Required. The name of the Managed Virtual Network |
+**Required parameters**
+| Parameter Name | Type | Description |
+| :-- | :-- | :-- |
+| `dataFactoryName` | string | The name of the Azure Data Factory |
+| `name` | string | The name of the Managed Virtual Network |
+
+**Optional parameters**
+| Parameter Name | Type | Default Value | Description |
+| :-- | :-- | :-- | :-- |
+| `enableDefaultTelemetry` | bool | `True` | Enable telemetry via the Customer Usage Attribution ID (GUID). |
+
 
 ## Outputs
 
 | Output Name | Type | Description |
 | :-- | :-- | :-- |
-| `managedVirtualNetworkName` | string | The name of the Managed Virtual Network. |
-| `managedVirtualNetworkResourceGroup` | string | The name of the Resource Group the Managed Virtual Network was created in. |
-| `managedVirtualNetworkResourceId` | string | The resource ID of the Managed Virtual Network. |
+| `name` | string | The name of the Managed Virtual Network. |
+| `resourceGroupName` | string | The name of the Resource Group the Managed Virtual Network was created in. |
+| `resourceId` | string | The resource ID of the Managed Virtual Network. |
 
 ## Template references
 
